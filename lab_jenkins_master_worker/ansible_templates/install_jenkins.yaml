@@ -11,7 +11,7 @@
       vars:
         package:
         - wget
-        - java-11-openjdk-devel
+        - java
         - git
       
     - name: clone repo
