@@ -11,9 +11,8 @@
       vars:
         package:
         - wget
-        - java
         - git
-      
+
     - name: clone repo
       git:
         repo: https://github.com/linuxacademy/content-terraform-jenkins.git
@@ -21,16 +20,16 @@
 
     - name: Setup Jenkins Repo
       get_url:
-        url: https://pkg.jenkins.io/redhat/jenkins.repo
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
         dest: /etc/yum.repos.d/jenkins.repo
-    
+
     - name: Import Jenkins Repo GPG key
       rpm_key:
         state: present
-        key: https://pkg.jenkins.io/redhat/jenkins.io.key
- 
-    - name: install epel 
-      shell: "amazon-linux-extras install epel -y"
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+    - name: install java-openjdk11
+      shell: "amazon-linux-extras install java-openjdk11 -y"
 
     - name: install Jenkins
       yum:
@@ -38,22 +37,21 @@
         state: present
 
     - name: Temporarily Stop Jenkins
-      service: 
-        name: jenkins 
+      service:
+        name: jenkins
         state: stopped
-   
+
     - name: Delete Jenkins default dir
       file:
         state: absent
         path: /var/lib/jenkins
-    
+
     - name: Copy over cloned Jenkins /var/lib/jenkins
       copy:
         remote_src: yes
         src: /tmp/jenkins/jenkins
         dest: /var/lib
-        
-         
+
     - name: Restore jenkins user ownership on /var/lib/jenkins
       file:
         path: /var/lib/jenkins
