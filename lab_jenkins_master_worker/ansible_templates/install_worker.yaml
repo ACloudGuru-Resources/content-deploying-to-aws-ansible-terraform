@@ -10,12 +10,12 @@
         size: 2048
         group: ec2-user
         owner: ec2-user
-    
+
     - name: Add own key to authorized_keys file
       shell: "cat /home/ec2-user/.ssh/id_rsa.pub >> /home/ec2-user/.ssh/authorized_keys && chmod 600 /home/ec2-user/.ssh/authorized_keys"
 
     - name: Copy over Jenkins Worker Node creation payload xml
-      vars: 
+      vars:
         ipv4: "{{ ansible_default_ipv4.address }}"
       template:
         src: node.j2
@@ -42,9 +42,21 @@
       vars:
         package:
         - wget
-        - java-1.8.0-openjdk-devel
         - git
-   
+
+    - name: Setup Jenkins Repo
+      get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Import Jenkins Repo GPG key
+      rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+    - name: install java-openjdk11
+      shell: "amazon-linux-extras install java-openjdk11 -y"
+
     - name: Get Jenkins CLI jar file
       vars:
         master: "{{ master_ip }}"
@@ -57,7 +69,7 @@
       until: download.status_code|default(200) == 200
       retries: 5
       delay: 5
-      
+
     - name: Allow execute perm to jenkins-cli.jar
       file:
         path: /home/ec2-user/jenkins-cli.jar
