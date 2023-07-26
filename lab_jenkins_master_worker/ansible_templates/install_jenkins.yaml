@@ -13,11 +13,6 @@
         - wget
         - git
 
-    - name: clone repo
-      git:
-        repo: https://github.com/linuxacademy/content-terraform-jenkins.git
-        dest: /tmp/jenkins
-
     - name: Setup Jenkins Repo
       get_url:
         url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
@@ -35,22 +30,6 @@
       yum:
         name: jenkins
         state: present
-
-    - name: Temporarily Stop Jenkins
-      service:
-        name: jenkins
-        state: stopped
-
-    - name: Delete Jenkins default dir
-      file:
-        state: absent
-        path: /var/lib/jenkins
-
-    - name: Copy over cloned Jenkins /var/lib/jenkins
-      copy:
-        remote_src: yes
-        src: /tmp/jenkins/jenkins
-        dest: /var/lib
 
     - name: Restore jenkins user ownership on /var/lib/jenkins
       file:
